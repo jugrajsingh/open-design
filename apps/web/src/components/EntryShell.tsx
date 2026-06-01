@@ -868,7 +868,7 @@ function OnboardingView({
     apiProtocol,
     config.baseUrl.trim().replace(/\/+$/, ''),
     config.apiKey.trim(),
-    config.apiVersion?.trim() ?? '',
+    apiProtocol === 'azure' ? (config.apiVersion?.trim() ?? '') : '',
   ].join('\n');
   const canTestProvider =
     Boolean(config.apiKey.trim()) &&

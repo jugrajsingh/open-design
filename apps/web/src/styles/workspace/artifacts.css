@@ -1520,6 +1520,9 @@
 
 .model-select-searchable {
   position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
 }
 .model-select-searchable.is-open {
   z-index: 1400;
@@ -1537,7 +1540,7 @@
   overflow: hidden;
 }
 .model-select-searchable__search-row {
-  padding: 6px;
+  padding: 0;
   border-bottom: 1px solid var(--border);
 }
 .model-select-searchable__input {

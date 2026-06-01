@@ -356,7 +356,7 @@ export function InlineModelSwitcher({
     apiProtocol,
     config.baseUrl.trim().replace(/\/+$/, ''),
     config.apiKey.trim(),
-    config.apiVersion?.trim() ?? '',
+    apiProtocol === 'azure' ? (config.apiVersion?.trim() ?? '') : '',
   ].join('\n');
   const providerForProtocol = useMemo(
     () =>
@@ -381,6 +381,38 @@ export function InlineModelSwitcher({
     () => apiModelOptions.map((id) => ({ id, label: id })),
     [apiModelOptions],
   );
+
+  useEffect(() => {
+    if (!open || config.mode !== 'api') return;
+    if (fetchedProviderModels.length > 0) return;
+    if (apiProtocol === 'azure' || apiProtocol === 'ollama') return;
+    const baseUrl = config.baseUrl?.trim() ?? '';
+    const apiKey = config.apiKey?.trim() ?? '';
+    if (!baseUrl || !apiKey) return;
+    let cancelled = false;
+    void fetchProviderModels({
+      protocol: apiProtocol,
+      baseUrl,
+      apiKey,
+    }).then((result) => {
+      if (cancelled || !result.ok || !result.models?.length) return;
+      setDiscoveredProviderModels((current) => ({
+        ...current,
+        [providerModelsInputKey]: result.models ?? [],
+      }));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    open,
+    config.mode,
+    apiProtocol,
+    config.baseUrl,
+    config.apiKey,
+    providerModelsInputKey,
+    fetchedProviderModels.length,
+  ]);
 
   // Chip text — keep it tight so the pill doesn't wrap on small viewports.
   // CLI: "Claude · Sonnet 4.5"; BYOK: "Anthropic · sonnet-4.5".
